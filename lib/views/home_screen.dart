@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wallpaper_app/data/category_data.dart';
+import 'package:wallpaper_app/models/category_model.dart';
 import 'package:wallpaper_app/widgets/appbar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,6 +11,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+List<CategoryModel> categories = [];
+
+ @override
+  void initState() {
+    categories = getCategories();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +49,38 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          SizedBox(height: 15,),
+Container(
+  height: 100,
+  child: ListView.builder(shrinkWrap: true, scrollDirection: Axis.horizontal, itemCount: categories.length, itemBuilder: (context, index) {
+    return CategoryBox(imgUrl: categories[index].categoryImg!, name: categories[index].categoryName!);
+  },),
+)
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryBox extends StatelessWidget {
+  const CategoryBox({super.key, required this.imgUrl, required this.name});
+
+  final String imgUrl;
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 100,
+      child: Stack(
+        children: [
+          Container(
+            
+            child: Image.network(imgUrl),
+          ),
+          Container(
+            child: Text(name),
+          )
         ],
       ),
     );
