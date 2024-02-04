@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+
 import 'package:flutter/material.dart';
 import 'package:wallpaper_app/data/category_data.dart';
 import 'package:wallpaper_app/models/category_model.dart';
+import 'package:wallpaper_app/services/api_services.dart';
 import 'package:wallpaper_app/widgets/appbar.dart';
+import 'package:wallpaper_app/widgets/wallpaper_grid_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,10 +16,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-List<CategoryModel> categories = [];
+  List<CategoryModel> categories = [];
+  List<String> wallpapers = [];
 
- @override
+  displayCuratedWallpapers() async {
+    final response = await ApiServices().getCuratedWallpapers();
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
+    List<dynamic> photos = jsonData['photos'];
+    List<String> portraitUrl = photos.map((photo) => photo['src']['portrait'] as String).toList();
+print(portraitUrl);
+    setState(() {
+      wallpapers = portraitUrl;
+    });
+  }
+
+  @override
   void initState() {
+    displayCuratedWallpapers();
     categories = getCategories();
     super.initState();
   }
@@ -39,23 +57,31 @@ List<CategoryModel> categories = [];
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: "Search",
-                      border: InputBorder.none
-                    
-                    ),
+                        hintText: "Search", border: InputBorder.none),
                   ),
                 ),
                 Icon(Icons.search),
               ],
             ),
           ),
-          SizedBox(height: 15,),
-Container(
-  height: 100,
-  child: ListView.builder(shrinkWrap: true, scrollDirection: Axis.horizontal, itemCount: categories.length, itemBuilder: (context, index) {
-    return CategoryBox(imgUrl: categories[index].categoryImg!, name: categories[index].categoryName!);
-  },),
-)
+          SizedBox(
+            height: 15,
+          ),
+          Container(
+            height: 100,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                return CategoryBox(
+                    imgUrl: categories[index].categoryImg!,
+                    name: categories[index].categoryName!);
+              },
+            ),
+          ),
+          wallpapers.isEmpty ? Center(child: CircularProgressIndicator()) : WallpaperGridView(wallpapers: wallpapers)
         ],
       ),
     );
@@ -71,15 +97,31 @@ class CategoryBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
+      // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      // color: Colors.green,
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       child: Stack(
         children: [
+          ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                imgUrl,
+                height: 55,
+                width: 110,
+                fit: BoxFit.cover,
+              )),
           Container(
-            
-            child: Image.network(imgUrl),
-          ),
-          Container(
-            child: Text(name),
+            height: 55,
+            width: 110,
+            color: Colors.black.withOpacity(0.3),
+            child: Center(
+                child: Text(
+              name,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            )),
           )
         ],
       ),
