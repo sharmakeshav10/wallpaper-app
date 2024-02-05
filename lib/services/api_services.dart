@@ -12,4 +12,12 @@ class ApiServices {
 
     return response;
   }
+
+  Future<http.Response> getSearchWallpapers(String searchQuery) async {
+    final response = await http.get(Uri.parse('https://api.pexels.com/v1/search?query=$searchQuery&per_page=20'), headers: {
+      'Authorization': 'OJCgY1o35ki5cVHsPNLRxB2Y6bIVdvTPABDzdzF0KEgDXwzBXFRmDCNw'
+    });
+
+    return response;
+  }
 }

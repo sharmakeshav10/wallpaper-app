@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 import 'package:wallpaper_app/data/category_data.dart';
 import 'package:wallpaper_app/models/category_model.dart';
 import 'package:wallpaper_app/services/api_services.dart';
+import 'package:wallpaper_app/views/search_screen.dart';
 import 'package:wallpaper_app/widgets/appbar.dart';
 import 'package:wallpaper_app/widgets/wallpaper_grid_view.dart';
 
@@ -19,15 +19,22 @@ class _HomeScreenState extends State<HomeScreen> {
   List<CategoryModel> categories = [];
   List<String> wallpapers = [];
 
+  TextEditingController searchController = new TextEditingController();
+
   displayCuratedWallpapers() async {
-    final response = await ApiServices().getCuratedWallpapers();
-    Map<String, dynamic> jsonData = jsonDecode(response.body);
-    List<dynamic> photos = jsonData['photos'];
-    List<String> portraitUrl = photos.map((photo) => photo['src']['portrait'] as String).toList();
-print(portraitUrl);
-    setState(() {
-      wallpapers = portraitUrl;
-    });
+    try {
+      final response = await ApiServices().getCuratedWallpapers();
+      Map<String, dynamic> jsonData = jsonDecode(response.body);
+      List<dynamic> photos = jsonData['photos'];
+      List<String> portraitUrl =
+          photos.map((photo) => photo['src']['portrait'] as String).toList();
+      print(portraitUrl);
+      setState(() {
+        wallpapers = portraitUrl;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   @override
@@ -58,11 +65,19 @@ print(portraitUrl);
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: searchController,
                         decoration: InputDecoration(
                             hintText: "Search", border: InputBorder.none),
                       ),
                     ),
-                    Icon(Icons.search),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) => SearchScreen(
+                                    searchQuery: searchController.text,
+                                  )));
+                        },
+                        child: Icon(Icons.search)),
                   ],
                 ),
               ),
@@ -83,8 +98,9 @@ print(portraitUrl);
                   },
                 ),
               ),
-              
-              wallpapers.isEmpty ? Center(child: CircularProgressIndicator()) : WallpaperGridView(wallpapers: wallpapers)
+              wallpapers.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : WallpaperGridView(wallpapers: wallpapers)
             ],
           ),
         ),
