@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wallpaper_app/data/category_data.dart';
 import 'package:wallpaper_app/models/category_model.dart';
 import 'package:wallpaper_app/services/api_services.dart';
+import 'package:wallpaper_app/views/categories_search_screen.dart';
 import 'package:wallpaper_app/views/search_screen.dart';
 import 'package:wallpaper_app/widgets/appbar.dart';
 import 'package:wallpaper_app/widgets/wallpaper_grid_view.dart';
@@ -117,34 +118,38 @@ class CategoryBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-      // color: Colors.green,
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      child: Stack(
-        children: [
-          ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                imgUrl,
-                height: 55,
-                width: 110,
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => Navigator.of(context)
+          .push(MaterialPageRoute(builder: (ctx) => CategorySearchScreen(categoryName: name,))),
+      child: Container(
+        // padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+        // color: Colors.green,
+        margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        child: Stack(
+          children: [
+            ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  imgUrl,
+                  height: 55,
+                  width: 110,
+                  fit: BoxFit.cover,
+                )),
+            Container(
+              height: 55,
+              width: 110,
+              color: Colors.black.withOpacity(0.3),
+              child: Center(
+                  child: Text(
+                name,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
               )),
-          Container(
-            height: 55,
-            width: 110,
-            color: Colors.black.withOpacity(0.3),
-            child: Center(
-                child: Text(
-              name,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            )),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
